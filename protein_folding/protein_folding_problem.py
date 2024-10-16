@@ -3,10 +3,9 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, List, Union
 
-# 迁移到新的类
-from qiskit_algorithms.utils import Result  # 替换 MinimumEigensolverResult
-from qiskit.algorithms.minimum_eigensolvers import VQE, SamplingVQE, QAOA, NumPyMinimumEigensolver
-from qiskit.quantum_info import SparsePauliOp  # 仍然使用 SparsePauliOp 替换 PauliOp 和 PauliSumOp
+# from qiskit.algorithms.minimum_eigensolvers import MinimumEigensolverResult
+from qiskit.algorithms.minimum_eigen_solvers import MinimumEigensolverResult
+from qiskit.quantum_info import SparsePauliOp  # 使用 SparsePauliOp 替换 PauliOp 和 PauliSumOp
 
 from .interactions.interaction import Interaction
 from .penalty_parameters import PenaltyParameters
@@ -57,7 +56,7 @@ class ProteinFoldingProblem(SamplingProblem):
         )
         self._unused_qubits: List[int] = []
 
-    def qubit_op(self) -> SparsePauliOp:
+    def qubit_op(self) -> SparsePauliOp:  # 修改为返回 SparsePauliOp
         """
         Builds a qubit operator for the Hamiltonian encoding a protein folding problem. The
         number of qubits needed for optimization is optimized (compressed), if possible.
@@ -73,11 +72,11 @@ class ProteinFoldingProblem(SamplingProblem):
         self._unused_qubits = unused_qubits
         return qubit_operator
 
-    def _qubit_op_full(self) -> SparsePauliOp:
+    def _qubit_op_full(self) -> SparsePauliOp:  # 修改为返回 SparsePauliOp
         """
         Builds a full qubit operator for the Hamiltonian encoding a protein folding problem. Full
         means that the number of qubits needed for optimization is not optimized and may be
-        larger than necessary. To ensure the optimal number of qubits, use the method `qubit_op`.
+        larger that necessary. To ensure the optimal number of qubits, use the method `qubit_op`.
 
         Returns:
             A qubit operator for the Hamiltonian encoding a protein folding problem.
@@ -85,12 +84,11 @@ class ProteinFoldingProblem(SamplingProblem):
         qubit_operator = self._qubit_op_builder.build_qubit_op()
         return qubit_operator
 
-    def interpret(self, raw_result: Result) -> "ProteinFoldingResult":  # 使用新的 Result 类
+    def interpret(self, raw_result: MinimumEigensolverResult) -> "ProteinFoldingResult":
         """
         Interprets the raw algorithm result, in the context of this problem, and returns a
         ProteinFoldingResult. The returned class can plot the protein and generate a
         .xyz file with the coordinates of each of its atoms.
-
         Args:
             raw_result: The raw result of solving the protein folding problem.
 
@@ -101,7 +99,7 @@ class ProteinFoldingProblem(SamplingProblem):
         # pylint: disable=import-outside-toplevel
         from .protein_folding_result import ProteinFoldingResult
 
-        probs = raw_result.eigenstate.binary_probabilities()  # 注意 API 是否需要更新
+        probs = raw_result.eigenstate.binary_probabilities()  # 保持原有逻辑，但注意 API 的潜在更新
         best_turn_sequence = max(probs, key=probs.get)
         return ProteinFoldingResult(
             unused_qubits=self.unused_qubits,
