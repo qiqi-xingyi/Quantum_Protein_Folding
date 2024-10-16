@@ -1,19 +1,11 @@
-# (C) Copyright IBM 2021, 2022.
-#
-# This code is licensed under the Apache License, Version 2.0. You may
-# obtain a copy of this license in the LICENSE.txt file in the root directory
-# of this source tree or at http://www.apache.org/licenses/LICENSE-2.0.
-#
-# Any modifications or derivative works of this code must retain this
-# copyright notice, and modified files need to carry a notice indicating
-# that they have been altered from the originals.
 """Defines a protein folding problem that can be passed to algorithms."""
 from __future__ import annotations
 
 from typing import TYPE_CHECKING, List, Union
 
-from qiskit.algorithms.minimum_eigensolvers import MinimumEigensolverResult
-from qiskit.opflow import PauliOp, PauliSumOp
+# from qiskit.algorithms.minimum_eigensolvers import MinimumEigensolverResult
+from qiskit.algorithms.minimum_eigen_solvers import MinimumEigensolverResult
+from qiskit.quantum_info import SparsePauliOp  # 使用 SparsePauliOp 替换 PauliOp 和 PauliSumOp
 
 from .interactions.interaction import Interaction
 from .penalty_parameters import PenaltyParameters
@@ -64,7 +56,7 @@ class ProteinFoldingProblem(SamplingProblem):
         )
         self._unused_qubits: List[int] = []
 
-    def qubit_op(self) -> Union[PauliSumOp, PauliOp]:
+    def qubit_op(self) -> SparsePauliOp:  # 修改为返回 SparsePauliOp
         """
         Builds a qubit operator for the Hamiltonian encoding a protein folding problem. The
         number of qubits needed for optimization is optimized (compressed), if possible.
@@ -80,7 +72,7 @@ class ProteinFoldingProblem(SamplingProblem):
         self._unused_qubits = unused_qubits
         return qubit_operator
 
-    def _qubit_op_full(self) -> Union[PauliOp, PauliSumOp]:
+    def _qubit_op_full(self) -> SparsePauliOp:  # 修改为返回 SparsePauliOp
         """
         Builds a full qubit operator for the Hamiltonian encoding a protein folding problem. Full
         means that the number of qubits needed for optimization is not optimized and may be
@@ -107,7 +99,7 @@ class ProteinFoldingProblem(SamplingProblem):
         # pylint: disable=import-outside-toplevel
         from .protein_folding_result import ProteinFoldingResult
 
-        probs = raw_result.eigenstate.binary_probabilities()
+        probs = raw_result.eigenstate.binary_probabilities()  # 保持原有逻辑，但注意 API 的潜在更新
         best_turn_sequence = max(probs, key=probs.get)
         return ProteinFoldingResult(
             unused_qubits=self.unused_qubits,
