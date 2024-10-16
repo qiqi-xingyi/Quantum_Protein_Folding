@@ -3,9 +3,8 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, List, Union
 
-# from qiskit.algorithms.minimum_eigensolvers import MinimumEigensolverResult
-from qiskit.algorithms.minimum_eigen_solvers import MinimumEigensolverResult
-from qiskit.quantum_info import SparsePauliOp  # 使用 SparsePauliOp 替换 PauliOp 和 PauliSumOp
+from qiskit_algorithms import MinimumEigensolverResult
+from qiskit.quantum_info import SparsePauliOp
 
 from .interactions.interaction import Interaction
 from .penalty_parameters import PenaltyParameters

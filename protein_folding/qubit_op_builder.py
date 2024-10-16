@@ -2,7 +2,9 @@
 from typing import Union
 
 import numpy as np
-from qiskit.opflow import OperatorBase, PauliOp, PauliSumOp
+
+from qiskit.quantum_info import SparsePauliOp, Pauli
+
 
 from .bead_contacts.contact_map import ContactMap
 from .bead_distances.distance_map import DistanceMap
@@ -46,7 +48,7 @@ class QubitOpBuilder:
             _side_chain_hot_vector[1] if len(_side_chain_hot_vector) > 1 else False
         )
 
-    def build_qubit_op(self) -> Union[PauliSumOp, PauliOp]:
+    def build_qubit_op(self) -> SparsePauliOp:
         """
         Builds a qubit operator for a total Hamiltonian for a protein folding problem. It includes
         8 terms responsible for chirality, geometry and nearest neighbors interactions.
@@ -98,7 +100,7 @@ class QubitOpBuilder:
 
     def _create_turn_operators(
         self, lower_bead: BaseBead, upper_bead: BaseBead
-    ) -> OperatorBase:
+    ) -> SparsePauliOp:
         """
         Creates a qubit operator for consecutive turns.
 
@@ -132,7 +134,7 @@ class QubitOpBuilder:
         )
         return turns_operator
 
-    def _create_h_back(self) -> Union[PauliSumOp, PauliOp]:
+    def _create_h_back(self) -> SparsePauliOp:
         """
         Creates Hamiltonian that imposes the geometrical constraint wherein consecutive turns along
         the same axis are penalized by a factor, penalty_back. Note, that the first two turns are
@@ -154,7 +156,7 @@ class QubitOpBuilder:
         h_back = _fix_qubits(h_back, self._has_side_chain_second_bead)
         return h_back
 
-    def _create_h_chiral(self) -> Union[PauliSumOp, PauliOp]:
+    def _create_h_chiral(self) -> SparsePauliOp:
         """
         Creates a penalty/constrain term to the total Hamiltonian that imposes that all the position
         of all side chain beads impose the right chirality. Note that the position of the side chain
@@ -279,7 +281,7 @@ class QubitOpBuilder:
             )
         )
 
-    def _create_h_bbbb(self) -> Union[PauliSumOp, PauliOp]:
+    def _create_h_bbbb(self) -> SparsePauliOp:
         """
         Creates Hamiltonian term corresponding to a 1st neighbor interaction between
         main/backbone (BB) beads.
@@ -359,7 +361,7 @@ class QubitOpBuilder:
                 h_bbbb = _fix_qubits(h_bbbb, self._has_side_chain_second_bead)
         return h_bbbb
 
-    def _create_h_bbsc_and_h_scbb(self) -> Union[PauliSumOp, PauliOp]:
+    def _create_h_bbsc_and_h_scbb(self) -> SparsePauliOp:
         """
         Creates Hamiltonian term corresponding to 1st neighbor interaction between
         main/backbone (BB) and side chain (SC) beads. In the absence
@@ -473,7 +475,7 @@ class QubitOpBuilder:
         h_scbb = _fix_qubits(h_scbb, self._has_side_chain_second_bead)
         return h_bbsc, h_scbb
 
-    def _create_h_scsc(self) -> Union[PauliSumOp, PauliOp]:
+    def _create_h_scsc(self) -> SparsePauliOp:
         """
         Creates Hamiltonian term corresponding to 1st neighbor interaction between
         side chain (SC) beads. In the absence of side chains, this function
@@ -505,7 +507,7 @@ class QubitOpBuilder:
                 )
         return _fix_qubits(h_scsc, self._has_side_chain_second_bead)
 
-    def _create_h_short(self) -> Union[PauliSumOp, PauliOp]:
+    def _create_h_short(self) -> SparsePauliOp:
         """
         Creates Hamiltonian constituting interactions between beads that are no more than
         4 beads apart. If no side chains are present, this function returns 0.
