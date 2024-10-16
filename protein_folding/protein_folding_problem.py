@@ -5,7 +5,6 @@ from typing import TYPE_CHECKING, List, Union
 
 # 迁移到新的类
 from qiskit_algorithms.utils import Result  # 替换 MinimumEigensolverResult
-from qiskit.algorithms.minimum_eigensolvers import VQE, SamplingVQE, QAOA, NumPyMinimumEigensolver
 from qiskit.quantum_info import SparsePauliOp  # 仍然使用 SparsePauliOp 替换 PauliOp 和 PauliSumOp
 
 from .interactions.interaction import Interaction
